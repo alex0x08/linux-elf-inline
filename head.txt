@@ -7,7 +7,7 @@ execute_elf_string(){
   perl -e '
     # Create memfd
     my $name = "";
-    my $fd = syscall(319, $fn, 0);
+    my $fd = syscall(319, $name, 1);
     if (-1 == $fd) { die "memfd_create: $!"; }
     # Copy binary
     open(my $fh, ">&=".$fd) or die "open: $!";
